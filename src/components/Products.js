@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { NavLink } from "react-router-dom";
 
+let nData;
 const Products = () => {
   const [data, setData] = useState([]);
+  console.log('data:',data)
+  nData=data;
+  console.log('nData:',nData)
+  // search
+  const [inputSearch, setInputSearch] = useState("");
 
   let api = "https://fakestoreapi.com/products";
   useEffect(() => {
@@ -14,6 +20,23 @@ const Products = () => {
     };
     getProducts();
   }, []);
+
+  // search
+  useEffect(() => {
+    const result = data?.filter((item) => {
+      return Object.values(item)
+        .join("")
+        .toLowerCase()
+        .includes(inputSearch.toLowerCase());
+    });
+
+    if (inputSearch.length > 0) {
+      setData(result);
+    } else {
+      setData(data);
+    }
+  }, [inputSearch]);
+
   return (
     <div>
       <div className="container my-5 py-5">
@@ -24,8 +47,15 @@ const Products = () => {
           </div>
         </div>
         {/* search box */}
-
-        <input className="search mb-3" type='text' placeholder="search here"></input>
+        <div>
+          <input
+            className="search mb-3"
+            type="text"
+            value={inputSearch}
+            onChange={(e) => setInputSearch(e.target.value)}
+            placeholder="search here"
+          ></input>
+        </div>
 
         {/* display card */}
         <div className="row justify-content-center">
@@ -34,15 +64,21 @@ const Products = () => {
                 return (
                   <div className="col-md-3 mb-4">
                     <div className="card h-100 text-center p-4" key={item.id}>
-                      <img src={item.image} className="card-img-top" 
-                      alt={item.title} height="250px"
+                      <img
+                        src={item.image}
+                        className="card-img-top"
+                        alt={item.title}
+                        height="250px"
                       />
                       <div className="card-body">
-                        <h5 className="card-title mb-0">{item.title.substring(0,12)}</h5>
-                        <p className="card-text lead fw-bold">
-                          ${item.price}
-                        </p>
-                        <NavLink to ={`/products/${item.id}`} className="btn btn-primary">
+                        <h5 className="card-title mb-0">
+                          {item.title.substring(0, 12)}
+                        </h5>
+                        <p className="card-text lead fw-bold">${item.price}</p>
+                        <NavLink
+                          to={`/products/${item.id}`}
+                          className="btn btn-primary"
+                        >
                           Buy Now
                         </NavLink>
                       </div>
